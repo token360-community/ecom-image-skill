@@ -12,7 +12,7 @@
 [![Claude Code](https://img.shields.io/badge/Claude%20Code-SKILL-blueviolet.svg)](https://docs.anthropic.com/en/docs/claude-code)
 [![Bash](https://img.shields.io/badge/bash-3.2%2B-green.svg)]()
 [![Version](https://img.shields.io/badge/version-0.3.3-black.svg)]()
-[![GPT-Image-2.5](https://img.shields.io/badge/GPT--Image-2.5-Flare%20%2F%20Sunburst-0d9488.svg)]()
+[![GPT-Image-2.5](https://img.shields.io/badge/GPT--Image--2.5-Flare%20%2F%20Sunburst-0d9488.svg)]()
 [![Token360](https://img.shields.io/badge/Token360-ready-8B2FE0.svg)](https://www.token360.ai/en-US/explore?utm_source=github&utm_medium=fork&utm_campaign=ecom-image-skill)
 
 **39 e-commerce templates · GPT-Image-2.5 two-model routing · campaign-set consistency · platform pre-checks · edit matrix · product motion GIFs · two-layer anti-"AI look" filter**

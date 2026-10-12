@@ -9,6 +9,8 @@ Modifications by Token360 (2026-10-11):
   Account and QR moved into it), Token360 quick start, "Made with Token360" gallery,
   "Differences from upstream" section. The author's community image link returned
   404 when checked and is kept as an HTML comment.
+- README.md / README.en.md: fixed the GPT-Image-2.5 shields.io badge URL (it rendered
+  "404 badge not found" upstream).
 - README.en.md: new English README (translation of README.md plus the sections above).
 - assets/banner.png: removed (upstream generated banner).
   assets/token360-header.webp: new header. Illustration generated with Token360
