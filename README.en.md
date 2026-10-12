@@ -142,11 +142,9 @@ Official OpenAI, OpenAI-compatible relays and cloud gateways (Vercel AI Gateway 
 ### Install
 
 ```bash
-git clone https://github.com/buluslan/gpt-image2-ecommerce.git ~/.claude/skills/ecom-image2
+git clone https://github.com/token360-community/ecom-image-skill.git ~/.claude/skills/ecom-image2
 cd ~/.claude/skills/ecom-image2
 ```
-
-(For this Token360 edition, clone the Token360 fork's URL instead once it is published.)
 
 Requirements: bash 3.2+, jq, curl, base64, awk (Mac/Linux). The pre-check also needs Python 3.9+ and Pillow; OCR additionally needs pytesseract and tesseract, and degrades explicitly when missing.
 

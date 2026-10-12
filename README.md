@@ -142,7 +142,7 @@ export IMAGE_MODEL="gpt-image-2.5-flare"          # 精修编辑用 gpt-image-2.
 ### 安装
 
 ```bash
-git clone https://github.com/buluslan/gpt-image2-ecommerce.git ~/.claude/skills/ecom-image2
+git clone https://github.com/token360-community/ecom-image-skill.git ~/.claude/skills/ecom-image2
 cd ~/.claude/skills/ecom-image2
 ```
 
