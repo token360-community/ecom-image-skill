@@ -36,6 +36,8 @@ One key for GPT-Image-2.5 Flare / Sunburst, GPT-Image-2, Seedream and more. No c
 2. Set the base URL and model, then generate your first image (needs bash, jq, curl):
 
 ```bash
+git clone https://github.com/token360-community/ecom-image-skill.git
+cd ecom-image-skill
 export TOKEN360_API_KEY="sk-..."                    # your Token360 key (never commit it)
 export IMAGE_API_BASE="https://api.token360.ai/v1"
 export IMAGE_API_KEY="$TOKEN360_API_KEY"
@@ -44,7 +46,7 @@ export IMAGE_REF_FIELD="images"                     # Token360's reference-image
 
 bash scripts/imagegen.sh --size 1024x1024 --quality medium \
   --prompt '{"subject":"matte sage-green ceramic pour-over coffee dripper on a walnut stand","scene_type":"product photography","use_case":"white-background marketplace hero"}' \
-  | jq -r '.data.images[0]'
+  | tee image-result.json | jq -r '.data.images[0]'
 # → file:///tmp/imagegen.XXXXXX.png   (about 15 s and about $0.02 in our test)
 ```
 
@@ -146,6 +148,18 @@ git clone https://github.com/token360-community/ecom-image-skill.git ~/.claude/s
 cd ~/.claude/skills/ecom-image2
 ```
 
+Alternative install (Node.js/npm required); restart Claude Code and check that `ecom-image2` appears in its skills. Run scripts from the installed skill directory.
+
+```bash
+npx --yes skills add token360-community/ecom-image-skill --agent claude-code --global --yes
+```
+
+For Codex, install with its agent flag (the skills CLI uses `~/.agents/skills/ecom-image2`):
+
+```bash
+npx --yes skills add token360-community/ecom-image-skill --agent codex --global --yes
+```
+
 Requirements: bash 3.2+, jq, curl, base64, awk (Mac/Linux). The pre-check also needs Python 3.9+ and Pillow; OCR additionally needs pytesseract and tesseract, and degrades explicitly when missing.
 
 > In api mode your product and reference images are uploaded to the endpoint you configure. Only use assets you have the right to upload, and check the endpoint's data-retention and privacy terms first.
@@ -169,14 +183,18 @@ The agent matches templates, assembles the prompt, suggests a model for your end
 # api mode
 bash scripts/imagegen.sh \
   --prompt-file <(echo '{"subject":"frosted glass serum bottle","scene_type":"product photography"}') \
-  --size 1024x1024 --quality high --mode api
+  --size 1024x1024 --quality medium --mode api | tee image-result.json
 
 # manual mode: export a prompt pack (no channel)
+printf '%s\n' '{"subject":"frosted glass serum bottle","scene_type":"product photography"}' > prompt.json
 bash scripts/imagegen.sh --prompt-file prompt.json --mode manual --output ./my-prompt-pack
 
 # pre-check (after generation)
-python3 scripts/compliance_check.py generated.png --platform amazon --strict | jq .
+image_path=$(jq -er '.data.images[0] | sub("^file://"; "")' image-result.json)
+python3 scripts/compliance_check.py "$image_path" --platform amazon --strict | jq .
 ```
+
+The pre-check can exit 1 when an image fails platform checks; this is a reported check result, not a generation error. Install Pillow in your Python environment; OCR additionally requires pytesseract and the tesseract executable.
 
 stdout is a single JSON envelope (`jq .data.images`; `data.cost` appears when the channel reports cost).
 

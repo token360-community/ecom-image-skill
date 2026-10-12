@@ -36,6 +36,8 @@
 2. 设置 base URL 与模型，出第一张图（需要 bash、jq、curl）：
 
 ```bash
+git clone https://github.com/token360-community/ecom-image-skill.git
+cd ecom-image-skill
 export TOKEN360_API_KEY="sk-..."                    # 你的 Token360 Key（不要提交到仓库）
 export IMAGE_API_BASE="https://api.token360.ai/v1"
 export IMAGE_API_KEY="$TOKEN360_API_KEY"
@@ -44,7 +46,7 @@ export IMAGE_REF_FIELD="images"                     # Token360 的参考图字�
 
 bash scripts/imagegen.sh --size 1024x1024 --quality medium \
   --prompt '{"subject":"matte sage-green ceramic pour-over coffee dripper on a walnut stand","scene_type":"product photography","use_case":"white-background marketplace hero"}' \
-  | jq -r '.data.images[0]'
+  | tee image-result.json | jq -r '.data.images[0]'
 # → file:///tmp/imagegen.XXXXXX.png   （实测约 15 秒，按 token 计费约 $0.02）
 ```
 
@@ -146,6 +148,18 @@ git clone https://github.com/token360-community/ecom-image-skill.git ~/.claude/s
 cd ~/.claude/skills/ecom-image2
 ```
 
+另一种安装方式（需要 Node.js/npm）；重启 Claude Code 后确认技能列表包含 `ecom-image2`。脚本命令请在已安装技能目录运行。
+
+```bash
+npx --yes skills add token360-community/ecom-image-skill --agent claude-code --global --yes
+```
+
+Codex 用户使用对应的 agent 参数安装（skills CLI 安装至 `~/.agents/skills/ecom-image2`）：
+
+```bash
+npx --yes skills add token360-community/ecom-image-skill --agent codex --global --yes
+```
+
 通用依赖：bash 3.2+、jq、curl、base64、awk（Mac/Linux）。技术预检另需 Python 3.9+ 与 Pillow；OCR 还需 pytesseract 和 tesseract，缺失时会明确降级。
 
 > API 模式会把产品图和参考图上传到你配置的端点。请只使用你有权上传的素材，并先确认端点的数据保留与隐私条款。
@@ -169,14 +183,18 @@ Agent 会自动匹配模板、组装 prompt、按端点能力建议模型、经�
 # api 模式出图
 bash scripts/imagegen.sh \
   --prompt-file <(echo '{"subject":"frosted glass serum bottle","scene_type":"product photography"}') \
-  --size 1024x1024 --quality high --mode api
+  --size 1024x1024 --quality medium --mode api | tee image-result.json
 
 # manual 模式导出 prompt 包（零通道）
+printf '%s\n' '{"subject":"frosted glass serum bottle","scene_type":"product photography"}' > prompt.json
 bash scripts/imagegen.sh --prompt-file prompt.json --mode manual --output ./my-prompt-pack
 
 # 技术预检（出图后）
-python3 scripts/compliance_check.py generated.png --platform amazon --strict | jq .
+image_path=$(jq -er '.data.images[0] | sub("^file://"; "")' image-result.json)
+python3 scripts/compliance_check.py "$image_path" --platform amazon --strict | jq .
 ```
+
+预检发现图片不符合平台要求时可返回退出码 1；这是检查结果，并非生成失败。请在 Python 环境安装 Pillow；OCR 还需要 pytesseract 和 tesseract 可执行文件。
 
 stdout 是单个 JSON envelope（`jq .data.images` 解析，通道返回成本时 `data.cost` 透出）。
 

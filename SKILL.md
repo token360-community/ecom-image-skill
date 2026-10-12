@@ -152,8 +152,10 @@ metadata:
 
 ### Step 6: 图像生成
 
+先将组装的提示词保存为 `assembled.json`，并在包含本 `SKILL.md` 的技能目录运行：
+
 ```bash
-bash scripts/imagegen.sh --prompt-file <assembled.json> --mode auto --quality high
+bash scripts/imagegen.sh --prompt-file assembled.json --mode auto --quality medium
 ```
 
 参考图通过 `--image <path>` 传入（可重复）；尺寸通过 `--size 1024x1024` 或 JSON 的 `size` 字段传入；模型经 Step 5.5 选型后由 `IMAGE_MODEL` 环境变量或用户通道配置决定。脚本已内置：
@@ -176,8 +178,10 @@ bash scripts/imagegen.sh --prompt-file <assembled.json> --mode auto --quality hi
 
 **7.1 主图技术预检**（调用 `scripts/compliance_check.py`）：
 
+将生成图片保存为 `image.png`（或替换为实际图片路径）：
+
 ```bash
-python3 scripts/compliance_check.py <image.png> --platform amazon --strict
+python3 scripts/compliance_check.py image.png --platform amazon --strict
 ```
 
 脚本做 3 项检测，返回 JSON envelope `{ok, platform, checks:{white_bg, foreground_ratio, ocr_text}, violations, suggestions}`：

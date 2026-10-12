@@ -26,11 +26,11 @@ export IMAGE_REF_FIELD="images"
 
 # 1–4: text-to-image
 IMAGE_MODEL=gpt-image-2.5-flare bash scripts/imagegen.sh --mode api \
-  --prompt-file examples/token360-gallery/prompts/01-hero-image.json --size 1024x1024 --quality high
+  --prompt-file examples/token360-gallery/prompts/01-hero-image.json --size 1024x1024 --quality medium
 
 # 5–6: edits with a reference image
 IMAGE_MODEL=gpt-image-2.5-sunburst bash scripts/imagegen.sh --mode api \
-  --prompt-file examples/token360-gallery/prompts/05-edit-recolor.json --size 1536x1024 --quality high \
+  --prompt-file examples/token360-gallery/prompts/05-edit-recolor.json --size 1536x1024 --quality medium \
   --image examples/token360-gallery/01-hero-image.jpg
 
 # 7–8: low-cost Seedream route (watermark off)

@@ -260,7 +260,7 @@ validate_size() {
 peek_size_from_prompt() {
   local raw=""
   if [[ -n "${PROMPT_FILE:-}" && -f "$PROMPT_FILE" ]]; then
-    raw="$(cat "$PROMPT_FILE")"
+    raw="$(cat "$PROMPT_FILE")" || die 2 "cannot read prompt file: $PROMPT_FILE"
   elif [[ -n "${PROMPT:-}" ]]; then
     raw="$PROMPT"
   fi
@@ -353,10 +353,10 @@ assemble_5slot() {
 get_prompt_text() {
   local raw
   if [[ -n "${PROMPT_FILE:-}" ]]; then
-    if [[ ! -f "$PROMPT_FILE" ]]; then
+    if [[ ! -r "$PROMPT_FILE" ]]; then
       die 2 "prompt file not found: $PROMPT_FILE"
     fi
-    raw="$(cat "$PROMPT_FILE")"
+    raw="$(cat "$PROMPT_FILE")" || die 2 "cannot read prompt file: $PROMPT_FILE"
   elif [[ -n "${PROMPT:-}" ]]; then
     raw="$PROMPT"
   else
