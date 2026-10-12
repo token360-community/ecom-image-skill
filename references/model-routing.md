@@ -52,3 +52,18 @@ Flare 相比 GPT-Image-2 的官方发布口径是质量更高、延迟降低 50%
 - `references/scenarios/*.json` 的 `model_hint` 字段（部分模板携带）给出该场景的建议模型——edit 类模板一律 sunburst，质量敏感类（A+/信息图/杂志/品牌故事）sunburst，其余默认 flare
 - `model_hint` 是建议不是强制：用户的通道若只有 2.0 模型（`gpt-image-2`），路由逻辑照常工作，只是放弃 2.5 增益
 - 调用侧：`IMAGE_MODEL` 环境变量或请求 JSON 的 `model` 字段最终决定——编排层把建议写进组装说明，通道层尊重用户配置
+
+## 六、Token360 路由（Token360 版新增）
+
+同一个 Key 可调用以下图像模型（`IMAGE_API_BASE=https://api.token360.ai/v1`；价格为 2026-10-11 Token360 公开价，实时价格见 [Token360 模型列表](https://www.token360.ai/en-US/explore?utm_source=github&utm_medium=fork&utm_campaign=ecom-image-skill)）：
+
+| 用途 | `IMAGE_MODEL` | 计价 | 备注 |
+|---|---|---|---|
+| 默认生成 / 套图初稿 | `gpt-image-2.5-flare` | 按 token：输出图像 $38.85/M（本仓库示例 high 档每张约 $0.05–0.07） | |
+| 定稿 / edit 矩阵 / 文字密集图 | `gpt-image-2.5-sunburst` | 同上 | 参考图设 `IMAGE_REF_FIELD=images` |
+| 2.0 基线 | `gpt-image-2` | 同上 | |
+| 低成本批量（SKU 变体、社媒图） | `seedream-4.5` | $0.0518/张 | 默认带水印，加 `IMAGE_EXTRA_BODY='{"watermark":false}'` |
+| 最低成本批量 | `dola-seedream-5.0-lite` | $0.0453/张 | 同上；默认尺寸 2048x2048 |
+
+Seedream 不接受 `n` 参数；本 fork 的 `imagegen.sh` 仅在 `--count > 1` 时发送 `n`，因此单张出图可直接使用。
+

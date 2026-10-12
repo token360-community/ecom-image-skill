@@ -1,0 +1,31 @@
+This repository is a modified version of https://github.com/buluslan/gpt-image2-ecommerce
+(commit 73abd50bf2b689b5a453f28ddd7b0016415deec6, 2026-09-17),
+Copyright (c) 2026 buluslan, licensed under the MIT License (see LICENSE, unchanged).
+All credit for the original design, templates, prompts and code goes to buluslan
+(Buluu@新西楼.AI) and the upstream contributors.
+
+Modifications by Token360 (2026-10-11):
+- README.md: Token360 header image, credit block (author credit, WeChat Official
+  Account and QR moved into it), Token360 quick start, "Made with Token360" gallery,
+  "Differences from upstream" section. The author's community image link returned
+  404 when checked and is kept as an HTML comment.
+- README.en.md: new English README (translation of README.md plus the sections above).
+- assets/banner.png: removed (upstream generated banner).
+  assets/token360-header.webp: new header. Illustration generated with Token360
+  (gpt-image-2.5-flare); Token360 wordmark and title overlaid with HTML/headless Chrome.
+- examples/token360-gallery/: new sample outputs generated with Token360 models
+  (gpt-image-2.5-flare, gpt-image-2.5-sunburst, dola-seedream-5.0-lite, seedream-4.5),
+  with prompt files and per-image cost.
+- scripts/imagegen.sh (generic fixes; other providers unaffected):
+  * IMAGE_API_BASE may end in /v1 (it is stripped; request paths already include /v1).
+  * "n" is only sent when --count > 1 (some models reject the parameter).
+  * New IMAGE_REF_FIELD (reference-image field name; default image_urls).
+  * New IMAGE_EXTRA_BODY (JSON object merged into the request body).
+  * Fixed reference-image encoding on Linux: GNU base64 wraps lines, which produced
+    invalid JSON; newlines are now stripped.
+- SKILL.md, references/model-routing.md: short Token360 configuration notes.
+- .env.example: new.
+
+"Token360" is a trademark of Token360. GPT-Image is a trademark of OpenAI; Seedream is a
+trademark of ByteDance. Upstream names and marks belong to their owners. This fork is
+not affiliated with or endorsed by the original author, OpenAI or ByteDance.

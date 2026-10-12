@@ -1,26 +1,66 @@
 <div align="center">
 
-<img src="assets/banner.png" alt="E-Commerce Image Generator" width="100%">
+<img src="assets/token360-header.webp" alt="E-Commerce Image Skill · Token360 edition" width="100%">
 
-# 🎨 E-Commerce Image Generator
+# 🎨 E-Commerce Image Generator · Token360 版
 
 **GPT-Image-2/2.5 驱动的跨境电商视觉资产生成工具——通道无关，39 个场景模板分钟级出专业产品图**
 
-**想了解更多最新AI行业动态,AI+电商/广告的行业实践方法,人与AI如何协作共生的思考,请关注公众号:【新西楼.AI】**
-
-![qrcode_for_gh_e3b954bd3859_258](https://github.com/user-attachments/assets/d8f068d9-c4f8-46c7-914c-fbcab5d52f2a)
+[中文](README.md) · [English](README.en.md)
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Claude Code](https://img.shields.io/badge/Claude%20Code-SKILL-blueviolet.svg)](https://docs.anthropic.com/en/docs/claude-code)
 [![Bash](https://img.shields.io/badge/bash-3.2%2B-green.svg)]()
 [![Version](https://img.shields.io/badge/version-0.3.3-black.svg)]()
 [![GPT-Image-2.5](https://img.shields.io/badge/GPT--Image-2.5-Flare%20%2F%20Sunburst-0d9488.svg)]()
+[![Token360](https://img.shields.io/badge/Token360-ready-8B2FE0.svg)](https://www.token360.ai/en-US/explore?utm_source=github&utm_medium=fork&utm_campaign=ecom-image-skill)
 
 **39个电商场景模板 · GPT-Image-2.5双模型路由 · Campaign套图一致性 · 平台技术预检 · Edit矩阵 · 产品动图 · 反AI感双层过滤**
 
-**Created By Buluu@新西楼.AI**
-
 </div>
+
+> [!NOTE]
+> **本仓库 fork 自 [buluslan/gpt-image2-ecommerce](https://github.com/buluslan/gpt-image2-ecommerce)，原作者 [buluslan](https://github.com/buluslan)（Buluu@新西楼.AI），MIT 许可。原项目的全部功劳归原作者所有。**
+>
+> 39 个场景模板、提示词方法论、脚本与文档均出自原作者及[全体贡献者](https://github.com/buluslan/gpt-image2-ecommerce/graphs/contributors)。Token360 版只做了这些事：增加 Token360 快速上手、对 `scripts/imagegen.sh` 做了几处通用兼容修复、换了头图，并新增一组用 Token360 模型生成的示例图。本仓库与原作者无隶属或背书关系。原 [LICENSE](LICENSE) 与版权声明保持不变，全部改动见 [NOTICE](NOTICE)。欢迎给[原项目](https://github.com/buluslan/gpt-image2-ecommerce)点 ⭐，与 Token360 无关的改进请直接提交到上游。
+>
+> **原作者署名与联系方式**：Created By Buluu@新西楼.AI · 想了解更多最新AI行业动态,AI+电商/广告的行业实践方法,人与AI如何协作共生的思考,请关注公众号:【新西楼.AI】
+>
+> ![qrcode_for_gh_e3b954bd3859_258](https://github.com/user-attachments/assets/d8f068d9-c4f8-46c7-914c-fbcab5d52f2a)
+
+## ⚡ Token360 快速上手
+
+一个 Key 调用 GPT-Image-2.5 Flare / Sunburst、GPT-Image-2、Seedream 等图像模型，脚本无需改动，只设环境变量：
+
+1. 注册并创建 API Key：[token360.ai 注册](https://www.token360.ai/en-US/sign-up?utm_source=github&utm_medium=fork&utm_campaign=ecom-image-skill)
+2. 设置 base URL 与模型，出第一张图（需要 bash、jq、curl）：
+
+```bash
+export TOKEN360_API_KEY="sk-..."                    # 你的 Token360 Key（不要提交到仓库）
+export IMAGE_API_BASE="https://api.token360.ai/v1"
+export IMAGE_API_KEY="$TOKEN360_API_KEY"
+export IMAGE_MODEL="gpt-image-2.5-flare"            # 精修/编辑用 gpt-image-2.5-sunburst
+export IMAGE_REF_FIELD="images"                     # Token360 的参考图字段（用 --image 时生效）
+
+bash scripts/imagegen.sh --size 1024x1024 --quality medium \
+  --prompt '{"subject":"matte sage-green ceramic pour-over coffee dripper on a walnut stand","scene_type":"product photography","use_case":"white-background marketplace hero"}' \
+  | jq -r '.data.images[0]'
+# → file:///tmp/imagegen.XXXXXX.png   （实测约 15 秒，按 token 计费约 $0.02）
+```
+
+**低成本批量路线**（SKU 变体、社媒图）：`IMAGE_MODEL="seedream-4.5"`（$0.0518/张）或 `IMAGE_MODEL="dola-seedream-5.0-lite"`（$0.0453/张），并加 `IMAGE_EXTRA_BODY='{"watermark":false}'` 关闭 Seedream 默认水印。实时价格与全部模型见 [Token360 模型列表](https://www.token360.ai/en-US/explore?utm_source=github&utm_medium=fork&utm_campaign=ecom-image-skill)。其他通道（OpenAI 官方、各类兼容中转、manual 模式）照常可用，见下方「快速开始」。
+
+## 🖼️ Made with Token360
+
+用本 Skill 的场景模板 + `scripts/imagegen.sh` 经 Token360 生成（虚构、无品牌的产品；prompt、模型与费用见 [examples/token360-gallery](examples/token360-gallery/README.md)）：
+
+| 白底主图 · hero-image | 生活场景 · lifestyle-scene | 卖点信息图 · infographic | A+ 模块 · a-plus-modules |
+|---|---|---|---|
+| <img src="examples/token360-gallery/01-hero-image.jpg" width="200"> | <img src="examples/token360-gallery/02-lifestyle-scene.jpg" width="200"> | <img src="examples/token360-gallery/03-infographic.jpg" width="200"> | <img src="examples/token360-gallery/04-a-plus-module.jpg" width="200"> |
+| `gpt-image-2.5-flare` | `gpt-image-2.5-flare` | `gpt-image-2.5-sunburst` | `gpt-image-2.5-sunburst` |
+| **换色 SKU · edit-recolor** | **产品动图 · motion-gif** | **平铺 · flat-lay** | **礼盒 · gift-set** |
+| <img src="examples/token360-gallery/05-edit-recolor.jpg" width="200"> | <img src="examples/token360-gallery/06-motion.gif" width="200"> | <img src="examples/token360-gallery/07-flat-lay.jpg" width="200"> | <img src="examples/token360-gallery/08-gift-set.jpg" width="200"> |
+| `gpt-image-2.5-sunburst` + 参考图 | `gpt-image-2.5-sunburst` 16 格帧图 → GIF | `dola-seedream-5.0-lite` | `seedream-4.5` |
 
 ---
 
@@ -93,7 +133,7 @@ export IMAGE_API_KEY="sk-xxx"                     # 兼容旧变量 OPENAI_API_K
 export IMAGE_MODEL="gpt-image-2.5-flare"          # 精修编辑用 gpt-image-2.5-sunburst
 ```
 
-官方 OpenAI、各类 OpenAI 兼容中转、云网关（Vercel AI Gateway / Cloudflare Workers AI 等）均可；参考图自动走 `image_urls`，端点不认时自动回退官方 `/v1/images/edits`。
+官方 OpenAI、各类 OpenAI 兼容中转、云网关（Vercel AI Gateway / Cloudflare Workers AI 等）均可；参考图自动走 `image_urls`，端点不认时自动回退官方 `/v1/images/edits`。（Token360 版：`IMAGE_API_BASE` 带不带 `/v1` 都可以；参考图字段可用 `IMAGE_REF_FIELD` 改名，额外参数可用 `IMAGE_EXTRA_BODY` 传入，见上方 Token360 快速上手。）
 
 **manual 模式（零通道）**——不配任何 API，导出 prompt 包贴进 ChatGPT 或自己 curl。
 
@@ -161,7 +201,9 @@ stdout 是单个 JSON envelope（`jq .data.images` 解析，通道返回成本�
 
 **社区介绍:[my.feishu.cn/wiki/WNi0wh3mIiOLhzkCLFPcwUr9nrg](https://my.feishu.cn/wiki/WNi0wh3mIiOLhzkCLFPcwUr9nrg)**
 
+<!-- 原作者的社区介绍图（Token360 版检查时该附件链接返回 404，暂以注释保留原文）：
 <img width="1125" height="618" alt="image" src="https://github.com/user-attachments/assets/20f47cd6-e33c-4f3e-9362-3846c11135fd" />
+-->
 
 </div>
 
@@ -185,7 +227,8 @@ gpt-image2-ecommerce/
 │   ├── funnel-set.md               # 套图编排漏斗
 │   ├── style-blacklist.md          # 品类×风格冲突 + slop 词
 │   └── platform-constraints.md     # 平台合规硬约束
-├── assets/                         # banner + 默认样式 Lock 基线
+├── assets/                         # 头图（Token360 版）+ 默认样式 Lock 基线
+├── examples/token360-gallery/      # Token360 版新增：示例图 + 生成 prompt
 └── evals/                          # 11 个测试用例
 ```
 
@@ -206,6 +249,14 @@ gpt-image2-ecommerce/
 
 ---
 
+## 🔀 与上游的差异（Token360 版）
+
+- 新增 Token360 快速上手、示例图集与 `.env.example`；头图替换为 Token360 头图（原 `assets/banner.png` 已移除）
+- `scripts/imagegen.sh` 通用兼容修复（对其他通道无副作用）：`IMAGE_API_BASE` 允许以 `/v1` 结尾；`n=1` 时不再发送 `n`（部分模型不接受该参数）；新增 `IMAGE_REF_FIELD`、`IMAGE_EXTRA_BODY`；修复 Linux 下 `base64` 自动换行导致参考图请求 JSON 无效的问题
+- 详细清单见 [NOTICE](NOTICE)
+
+---
+
 ## 📜 License
 
-MIT License — 见 [LICENSE](LICENSE)
+MIT License — 见 [LICENSE](LICENSE)（原版权声明保留不变；Token360 版改动说明见 [NOTICE](NOTICE)）

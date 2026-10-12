@@ -159,6 +159,7 @@ bash scripts/imagegen.sh --prompt-file <assembled.json> --mode auto --quality hi
 参考图通过 `--image <path>` 传入（可重复）；尺寸通过 `--size 1024x1024` 或 JSON 的 `size` 字段传入；模型经 Step 5.5 选型后由 `IMAGE_MODEL` 环境变量或用户通道配置决定。脚本已内置：
 
 - **通道无关后端**：`--mode api`（默认自动）对接**任何 OpenAI 兼容端点**——env 三变量 `IMAGE_API_BASE` / `IMAGE_API_KEY`（兼容旧 `OPENAI_API_KEY`）/ `IMAGE_MODEL`；参考图走 `image_urls`，端点不认时自动回退官方 `/v1/images/edits` multipart
+- **Token360（本 fork 新增说明）**：`IMAGE_API_BASE=https://api.token360.ai/v1` + `IMAGE_API_KEY=$TOKEN360_API_KEY` + `IMAGE_MODEL`（`gpt-image-2.5-flare` / `gpt-image-2.5-sunburst` / `gpt-image-2` / `seedream-4.5` / `dola-seedream-5.0-lite`）；参考图设 `IMAGE_REF_FIELD=images`；Seedream 路线加 `IMAGE_EXTRA_BODY='{"watermark":false}'`
 - **manual 模式**：`--mode manual` 零通道降级——导出 prompt 包（prompt.txt + request.json + 使用说明），贴 ChatGPT 或自行 curl 均可
 - **cli 模式**（DEPRECATED legacy）：codex exec 直连
 - **quality 参数**：`--quality low|medium|high|xhigh|max|auto`（2.5 新增 xhigh/max）

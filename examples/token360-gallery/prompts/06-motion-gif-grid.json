@@ -1,0 +1,7 @@
+{
+  "scene_type": "16-frame contact sheet for stop-motion style product animation, arranged as a 4x4 grid, frames read left-to-right top-to-bottom",
+  "subject": "the exact pour-over dripper set from the reference image, identical across ALL 16 frames: same shape, color, materials, lighting",
+  "details": "camera orbits the product from left to right by 60 degrees total across the sequence (start 30 degrees left, end 30 degrees right), product stays centered and stationary; equal square cells, consistent margins, white background",
+  "use_case": "auto-looping product motion GIF for a product detail page",
+  "constraints": "consistent product identity across frames, smooth incremental change between adjacent frames, no frame borders, no numbering, no text, no watermark"
+}

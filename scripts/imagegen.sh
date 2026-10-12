@@ -5,9 +5,14 @@
 #
 # Modes:
 #   api    (default) any OpenAI-compatible endpoint, env-configured:
-#            IMAGE_API_BASE   (default https://api.openai.com)
+#            IMAGE_API_BASE   (default https://api.openai.com; a trailing /v1 is
+#                              accepted, e.g. https://api.token360.ai/v1)
 #            IMAGE_API_KEY    (falls back to legacy $OPENAI_API_KEY)
 #            IMAGE_MODEL      (default gpt-image-2.5-flare; e.g. gpt-image-2.5-sunburst)
+#            IMAGE_EXTRA_BODY (optional JSON object merged into the request
+#                              body, e.g. '{"watermark":false}')
+#            IMAGE_REF_FIELD  (JSON field for reference images; default
+#                              image_urls, Token360 uses images)
 #          Reference images ride in `image_urls` (data URLs); endpoints that
 #          reject that form fall back to the official /v1/images/edits.
 #   manual no API at all — exports a prompt pack (prompt.txt + request.json +
@@ -96,7 +101,10 @@ Modes:
   api     - Any OpenAI-compatible endpoint (official, relay, cloud gateway).
             Env: IMAGE_API_BASE (default https://api.openai.com),
             IMAGE_API_KEY (falls back to OPENAI_API_KEY),
-            IMAGE_MODEL (default gpt-image-2.5-flare).
+            IMAGE_MODEL (default gpt-image-2.5-flare),
+            IMAGE_EXTRA_BODY (optional JSON object merged into the body),
+            IMAGE_REF_FIELD (reference-image field; default image_urls,
+            use "images" for Token360).
             Reference images go in `image_urls` (data URLs); endpoints that
             reject that form fall back to the official /v1/images/edits.
   manual  - No API call. Exports a prompt pack (prompt.txt + request.json +
@@ -522,7 +530,13 @@ generate_via_cli() {
 # ===========================================================================
 
 # Resolve credentials: IMAGE_API_* wins; legacy OPENAI_* respected.
-api_base()  { echo "${IMAGE_API_BASE:-${OPENAI_BASE:-https://api.openai.com}}"; }
+# Accepts the base with or without a trailing /v1 (e.g. https://api.token360.ai/v1):
+# the request paths below already include /v1, so a trailing /v1 is stripped.
+api_base()  {
+  local b="${IMAGE_API_BASE:-${OPENAI_BASE:-https://api.openai.com}}"
+  b="${b%/}"; b="${b%/v1}"
+  echo "$b"
+}
 api_key()   { echo "${IMAGE_API_KEY:-${OPENAI_API_KEY:-}}"; }
 api_model() { echo "${IMAGE_MODEL:-gpt-image-2.5-flare}"; }
 
@@ -539,7 +553,9 @@ build_image_urls_json() {
       webp)     mime="image/webp" ;;
       *)        mime="image/png" ;;
     esac
-    b64=$(base64 -i "$img" 2>/dev/null) || b64=$(base64 "$img" 2>/dev/null)
+    # tr -d strips the line wrapping GNU base64 adds (macOS does not wrap);
+    # raw newlines inside a JSON string make the request body invalid.
+    b64=$(base64 < "$img" 2>/dev/null | tr -d '\n\r')
     [[ -z "$b64" ]] && die 2 "failed to base64-encode reference image: $img"
     (( first )) || printf ','
     first=0
@@ -671,16 +687,32 @@ generate_via_api() {
   local body_file
   body_file=$(mktemp -t imagegen_body.XXXXXX.json 2>/dev/null) || die 4 "mktemp failed"
   {
-    printf '{"model":%s,"prompt":%s,"n":%s' \
-      "$(printf '%s' "$model" | jq -Rs .)" "$(printf '%s' "$prompt_text" | jq -Rs .)" "$COUNT"
+    printf '{"model":%s,"prompt":%s' \
+      "$(printf '%s' "$model" | jq -Rs .)" "$(printf '%s' "$prompt_text" | jq -Rs .)"
+    # n is only sent when >1: it defaults to 1 on OpenAI, and some models
+    # (e.g. Seedream on Token360) reject the parameter entirely.
+    (( COUNT > 1 )) && printf ',"n":%s' "$COUNT"
     [[ -n "$SIZE" ]] && printf ',"size":"%s"' "$SIZE"
     [[ -n "$QUALITY" ]] && printf ',"quality":"%s"' "$QUALITY"
     if [[ ${#IMAGES[@]} -gt 0 ]]; then
-      printf ',"image_urls":'
+      # Field name for reference images: relay-common `image_urls` by default;
+      # Token360 expects `images` (set IMAGE_REF_FIELD=images).
+      printf ',"%s":' "${IMAGE_REF_FIELD:-image_urls}"
       build_image_urls_json
     fi
     printf '}'
   } > "$body_file"
+
+  # Optional provider-specific extras, merged into the JSON body, e.g.
+  #   IMAGE_EXTRA_BODY='{"watermark":false}'   (Seedream on Token360)
+  if [[ -n "${IMAGE_EXTRA_BODY:-}" ]]; then
+    echo "$IMAGE_EXTRA_BODY" | jq -e 'type == "object"' >/dev/null 2>&1 || \
+      die 2 "IMAGE_EXTRA_BODY must be a JSON object"
+    local merged
+    merged=$(jq -c --argjson x "$IMAGE_EXTRA_BODY" '. * $x' "$body_file") || \
+      die 2 "failed to merge IMAGE_EXTRA_BODY"
+    printf '%s' "$merged" > "$body_file"
+  fi
 
   API_LAST_HTTP_CODE=""
   if [[ ${#IMAGES[@]} -gt 0 ]]; then
